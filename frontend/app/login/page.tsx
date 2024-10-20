@@ -48,7 +48,7 @@ export default function LoginPage() {
         Login
       </button>
       <p className="text-md m-3 max-w-2xl">
-        Don't have an account?
+        Don&apos;t have an account?
         <Link href="/register">
           <span className="font-bold"> Register</span>
         </Link>
