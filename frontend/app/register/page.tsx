@@ -2,13 +2,13 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import axios from "axios";
 import Link from "next/link";
+import axios from "axios";
+import { toast } from "react-toastify";
 
 export default function RegisterPage() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
   const router = useRouter();
 
   const handleRegister = async () => {
@@ -20,9 +20,9 @@ export default function RegisterPage() {
       router.push("/login"); // Redirect to login after successful registration
     } catch (err: any) {
       if (err.response && err.response.status === 400) {
-        setError("Username already taken");
+        toast.error("Username already taken");
       } else {
-        setError("Registration failed. Please try again.");
+        toast.error("Registration failed. Please try again.");
       }
     }
   };
@@ -56,8 +56,6 @@ export default function RegisterPage() {
           <span className="font-bold"> Login</span>
         </Link>
       </p>
-
-      {error && <p className="text-red-500 mt-4">{error}</p>}
     </div>
   );
 }

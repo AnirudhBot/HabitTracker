@@ -8,7 +8,7 @@ exports.register = async (req, res) => {
   try {
     const existingUser = await User.findOne({ username });
     if (existingUser) {
-      return res.status(400).json({ error: 'Username already taken' });
+      return res.status(400).json({ error: "Username already taken" });
     }
     const hashedPassword = await bcrypt.hash(password, 10);
     const newUser = await User.create({ username, password: hashedPassword });
@@ -41,7 +41,7 @@ exports.login = async (req, res) => {
       httpOnly: false, // Accessible by web server and JS both
       secure: process.env.NODE_ENV === "production", // Secure in production (HTTPS only)
       sameSite: "Lax",
-      maxAge: 86400000, // Cookie expiry in milliseconds (1 hour)
+      maxAge: 86400000, // Cookie expiry in milliseconds (1 day)
     });
 
     res.status(200).json({ message: "Login successful" });
@@ -60,8 +60,28 @@ exports.logout = async (req, res) => {
   res.status(200).json({ message: "Logged out successfully" });
 };
 
+exports.searchUser = async (req, res) => {
+  const searchTerm = req.query.query;
+
+  if (!searchTerm) {
+    return res.status(400).json({ message: "Search term is required" });
+  }
+
+  try {
+    const users = await User.find({
+      username: { $regex: searchTerm, $options: "i" }, // Case-insensitive search
+      _id: { $ne: req.user.userId }, // Exclude the current logged-in user
+    }).select("username");
+
+    res.status(200).json({ users });
+  } catch (error) {
+    res.status(500).json({ message: "Error searching users" });
+  }
+};
+
 exports.addFriend = async (req, res) => {
-  const { userId, friendId } = req.body;
+  const { friendId } = req.body;
+  const userId = req.user.userId;
 
   try {
     const user = await User.findById(userId);
@@ -71,10 +91,23 @@ exports.addFriend = async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
+    if(user.friends.includes(friend._id)) {
+      return res.status(404).json({ message: "Already a friend" });
+    }
+
     user.friends.push(friend._id);
     await user.save();
     res.status(200).json({ message: "Friend added successfully" });
   } catch (error) {
     res.status(500).json({ message: error.message });
+  }
+};
+
+exports.listFriends = async (req, res) => {
+  try {
+    const user = await User.findById(req.user.userId).populate('friends', 'username coins');
+    res.status(200).json({ friends: user.friends });
+  } catch (error) {
+    res.status(500).json({ message: 'Error fetching friends' });
   }
 };

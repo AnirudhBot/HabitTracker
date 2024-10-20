@@ -2,13 +2,13 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import axios from "axios";
 import Link from "next/link";
+import axios from "axios";
+import { toast } from "react-toastify";
 
 export default function LoginPage() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
   const router = useRouter();
 
   const handleLogin = async () => {
@@ -18,10 +18,9 @@ export default function LoginPage() {
         { username, password },
         { withCredentials: true }
       );
-      console.log(response);
       router.push("/dashboard"); // Navigate to dashboard after successful login
     } catch (err) {
-      setError("Login failed. Please check your credentials.");
+      toast.error("Login failed. Please check your credentials.");
     }
   };
 
@@ -54,8 +53,6 @@ export default function LoginPage() {
           <span className="font-bold"> Register</span>
         </Link>
       </p>
-
-      {error && <p className="text-red-500 mt-4">{error}</p>}
     </div>
   );
 }
