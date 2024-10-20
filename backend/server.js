@@ -11,7 +11,7 @@ const PORT = process.env.PORT || 8000;
 
 app.use(
   cors({
-    origin: "http://localhost:3000",
+    origin: "https://habit-tracker-three-nu.vercel.app",
     credentials: true,
   })
 );
