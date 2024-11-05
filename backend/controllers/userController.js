@@ -44,7 +44,7 @@ exports.login = async (req, res) => {
       maxAge: 86400000, // Cookie expiry in milliseconds (1 day)
     });
 
-    res.status(200).json({ message: "Login successful" });
+    res.status(200).json({ message: "Login successful", token: token });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
